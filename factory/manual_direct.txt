@@ -119,3 +119,6 @@ chillyroom.com
 
 # IHG Internet Access
 portal.linkbroad.com
+
+# 工作
+okg.com
