@@ -10,6 +10,10 @@ DOMAIN-SUFFIX,ampproject.org,PROXY # Google AMP issue#237
 
 {{manual_reject}}
 
+# 广告规则误报例外
+# midway.run 是 ChatBox 等 App 自托管 Plausible/Sentry 的域名，被 hagezi PRO mini 全域封禁
+DOMAIN-SUFFIX,midway.run,DIRECT
+
 {{ad}}
 
 # 苹果与 iCloud 直连（Apple Books 等 App 的 iCloud 同步）
