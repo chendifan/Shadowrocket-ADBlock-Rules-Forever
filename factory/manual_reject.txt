@@ -274,3 +274,14 @@ kikibt8.xyz
 
 #用户提交
 pglstatp-toutiao.com
+
+#高德地图广告
+optimus-ads.amap.com
+
+#下厨房广告（广告与统计 SDK）
+ulogs.umengcloud.com
+ulogs.umeng.com
+sdk.e.qq.com
+open.e.kuaishou.com
+api-access.pangolin-sdk-toutiao.com
+sdk.open.talk.getui.net
