@@ -12,6 +12,13 @@ DOMAIN-SUFFIX,ampproject.org,PROXY # Google AMP issue#237
 
 {{ad}}
 
+# 苹果与 iCloud 直连（Apple Books 等 App 的 iCloud 同步）
+DOMAIN-SUFFIX,icloud.com,DIRECT
+DOMAIN-SUFFIX,icloud-content.com,DIRECT
+DOMAIN-SUFFIX,apple.com,DIRECT
+DOMAIN-SUFFIX,mzstatic.com,DIRECT
+DOMAIN-SUFFIX,cdn-apple.com,DIRECT
+
 GEOIP,CN,DIRECT
 
 FINAL,proxy
