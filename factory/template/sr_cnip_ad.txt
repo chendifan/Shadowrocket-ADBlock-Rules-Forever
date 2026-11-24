@@ -17,10 +17,17 @@ DOMAIN-SUFFIX,midway.run,DIRECT
 {{ad}}
 
 # 苹果与 iCloud 直连（Apple Books 等 App 的 iCloud 同步）
+# CloudKit 与 iCloud 同步核心（阅读进度、书签、笔记、高亮、书架目录）
+DOMAIN-SUFFIX,apple-cloudkit.com,DIRECT
 DOMAIN-SUFFIX,icloud.com,DIRECT
 DOMAIN-SUFFIX,icloud-content.com,DIRECT
-DOMAIN-SUFFIX,apple.com,DIRECT
+# 图书元数据与封面资源
 DOMAIN-SUFFIX,mzstatic.com,DIRECT
+DOMAIN-SUFFIX,itunes.apple.com,DIRECT
+# 国区 Apple ID（由云上贵州提供服务）
+DOMAIN-SUFFIX,icloud.com.cn,DIRECT
+DOMAIN-SUFFIX,apzones.com,DIRECT
+DOMAIN-SUFFIX,apple.com,DIRECT
 DOMAIN-SUFFIX,cdn-apple.com,DIRECT
 
 GEOIP,CN,DIRECT
