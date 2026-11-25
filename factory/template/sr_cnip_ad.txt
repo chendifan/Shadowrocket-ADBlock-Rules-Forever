@@ -30,6 +30,11 @@ DOMAIN-SUFFIX,apzones.com,DIRECT
 DOMAIN-SUFFIX,apple.com,DIRECT
 DOMAIN-SUFFIX,cdn-apple.com,DIRECT
 
+# JetBrains 客户端与插件下载
+# download-cdn.jetbrains.com 走 AWS CloudFront 边缘节点，GeoLite 数据库把这些 IP 判到新加坡或美国，
+# GEOIP,CN 命中不了，只能落到 FINAL,proxy，所以在这里显式直连
+DOMAIN-SUFFIX,download-cdn.jetbrains.com,DIRECT
+
 GEOIP,CN,DIRECT
 
 FINAL,proxy
