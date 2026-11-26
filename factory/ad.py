@@ -23,32 +23,37 @@ rules_url = [
     'https://pgl.yoyo.org/adservers/serverlist.php?hostformat=adblockplus;showintro=0',
 ]
 
+# Clash 格式规则文件，每行是 DOMAIN-SUFFIX,<域名>,REJECT-DROP，只取域名部分
+clash_rules_url = [
+    # 217heidai AdBlock Filters Lite，仅针对国内域名
+    'https://raw.githubusercontent.com/217heidai/adblockfilters/main/rules/adblockclashlite.list',
+]
+
 rule = ''
+clash_rule = ''
 
 # contain both domains and ips
 domains = []
 
 
+def fetch(url):
+    try_times = 0
+    while try_times < 5:
+        r = requests.get(url)
+        if r.status_code == 200:
+            return r.text
+        time.sleep(1)
+        try_times = try_times + 1
+    sys.exit('error in request %s\n\treturn code: %d' % (url, r.status_code))
+
+
 for rule_url in rules_url:
     print('loading... ' + rule_url)
+    rule = rule + fetch(rule_url) + '\n'
 
-    # get rule text
-    success = False
-    try_times = 0
-    r = None
-    while try_times < 5 and not success:
-        r = requests.get(rule_url)
-        if r.status_code != 200:
-            time.sleep(1)
-            try_times = try_times + 1
-        else:
-            success = True
-            break
-
-    if not success:
-        sys.exit('error in request %s\n\treturn code: %d' % (rule_url, r.status_code) )
-
-    rule = rule + r.text + '\n'
+for rule_url in clash_rules_url:
+    print('loading... ' + rule_url)
+    clash_rule = clash_rule + fetch(rule_url) + '\n'
 
 # except rules
 ignore = []
@@ -63,6 +68,40 @@ except:
 for ig in ad_ignore.readlines():
     if ig[0] != '#' and ig != '\n':
         ignore.append(ig.strip())
+
+domain_pattern = re.compile(r'^\.?[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})*\.[a-zA-Z0-9][-a-zA-Z0-9]{1,}$')
+ip_pattern = re.compile(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$')
+
+
+def add_domain(row, original):
+    row = row.strip()
+    if not row:
+        return
+
+    # 清除前缀
+    row = re.sub(r'^\|?https?://', '', row)
+    row = re.sub(r'^\|\|', '', row)
+    row = row.lstrip('.*')
+
+    # 清除后缀
+    row = row.rstrip('/*')
+    if row[-1] == '^':
+        # row = '.'+row
+        row = row.rstrip('^')
+    row = re.sub(r':\d{2,5}$', '', row)  # 清除端口
+
+    # 不能含有的字符
+    if re.search(r'[/^:*]', row):
+        print('ignore: ' + original)
+        return
+
+    # 去除 ignore 中的内容
+    if row in ignore:
+        return
+
+    # 只匹配域名或 IP
+    if domain_pattern.match(row) or ip_pattern.match(row):
+        domains.append(row)
 
 # parse rule
 rule = rule.split('\n')
@@ -83,37 +122,23 @@ for row in rule:
 
         continue
 
-
     # 处理广告黑名单规则
 
     # 直接跳过
     if row=='' or row.startswith('!') or "$" in row or "##" in row:
         continue
 
-    # 清除前缀
-    row = re.sub(r'^\|?https?://', '', row)
-    row = re.sub(r'^\|\|', '', row)
-    row = row.lstrip('.*')
+    add_domain(row, row0)
 
-    # 清除后缀
-    row = row.rstrip('/*')
-    if row[-1] == '^':
-        # row = '.'+row
-        row = row.rstrip('^')
-    row = re.sub(r':\d{2,5}$', '', row)  # 清除端口
-
-    # 不能含有的字符
-    if re.search(r'[/^:*]', row):
-        print('ignore: '+row0)
+# parse Clash 格式规则，只取规则类型和域名，丢掉 REJECT-DROP 动作
+for row in clash_rule.split('\n'):
+    row = row.strip()
+    if row == '' or row.startswith('#') or row.startswith('['):
         continue
-    
-    # 去除 ignore 中的内容
-    if row in ignore:
+    parts = row.split(',')
+    if len(parts) < 2 or parts[0] not in ('DOMAIN', 'DOMAIN-SUFFIX', 'IP-CIDR', 'IP-CIDR6'):
         continue
-
-    # 只匹配域名或 IP
-    if re.match(r'^\.?[a-zA-Z0-9][-a-zA-Z0-9]{0,62}(\.[a-zA-Z0-9][-a-zA-Z0-9]{0,62})*\.[a-zA-Z0-9][-a-zA-Z0-9]{1,}$', row) or re.match(r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$', row):
-        domains.append(row)
+    add_domain(parts[1], row)
 
 print('done.')
 
